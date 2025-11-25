@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # MySQL Service
+  mysqldb:
+    image: mysql:8.0
+    container_name: smartshop_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: smartshop_db
+      MYSQL_USER: smartshop_user
+      MYSQL_PASSWORD: smartshop_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+
+  # PhpMyAdmin Service (Auto-Login)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: smartshop_pma
+    restart: unless-stopped
+    depends_on:
+      - mysqldb
+    environment:
+      PMA_HOST: mysqldb
+      PMA_USER: root              # Auto-login User
+      PMA_PASSWORD: rootpassword  # Auto-login Password
+    ports:
+      - "8080:80"
