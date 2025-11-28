@@ -24,6 +24,10 @@ public class Client {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    private String fullName;
+
+    private String email;
+
     @Enumerated(EnumType.STRING)
     private CustomerTier tier;
 
