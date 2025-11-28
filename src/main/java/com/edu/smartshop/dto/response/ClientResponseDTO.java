@@ -8,7 +8,8 @@ import java.math.BigDecimal;
 @Data
 public class ClientResponseDTO {
     private Long id;
-    private String username;
+    private String fullName;
+    private String email;
     private CustomerTier tier;
     private BigDecimal totalSpent;
     private Integer totalOrders;
