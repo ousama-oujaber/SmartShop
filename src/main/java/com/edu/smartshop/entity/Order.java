@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -24,6 +25,8 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
+
+    private LocalDateTime date;
 
     private BigDecimal subTotal;
 

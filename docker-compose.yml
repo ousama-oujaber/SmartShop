@@ -28,4 +28,4 @@ services:
       PMA_USER: root              # Auto-login User
       PMA_PASSWORD: rootpassword  # Auto-login Password
     ports:
-      - "8080:80"
+      - "8081:80"
