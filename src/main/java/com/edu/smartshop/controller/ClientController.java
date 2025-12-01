@@ -1,13 +1,17 @@
 package com.edu.smartshop.controller;
 
 import com.edu.smartshop.dto.request.ClientCreateDTO;
+import com.edu.smartshop.dto.request.ClientUpdateDTO;
 import com.edu.smartshop.dto.response.ClientResponseDTO;
+import com.edu.smartshop.dto.response.OrderResponseDTO;
 import com.edu.smartshop.service.IClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/clients")
@@ -27,4 +31,19 @@ public class ClientController {
         ClientResponseDTO client = clientService.getClientById(id);
         return ResponseEntity.ok(client);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientResponseDTO> updateClient(
+            @PathVariable Long id,
+            @Valid @RequestBody ClientUpdateDTO updateDTO) {
+        ClientResponseDTO client = clientService.updateClient(id, updateDTO);
+        return ResponseEntity.ok(client);
+    }
+
+    @GetMapping("/{id}/orders")
+    public ResponseEntity<List<OrderResponseDTO>> getClientOrderHistory(@PathVariable Long id) {
+        List<OrderResponseDTO> orders = clientService.getClientOrderHistory(id);
+        return ResponseEntity.ok(orders);
+    }
 }
+

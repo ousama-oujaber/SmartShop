@@ -18,6 +18,8 @@ public interface ClientMapper {
     @Mapping(target = "tier", ignore = true)
     @Mapping(target = "totalSpent", ignore = true)
     @Mapping(target = "totalOrders", ignore = true)
+    @Mapping(target = "firstOrderDate", ignore = true)
+    @Mapping(target = "lastOrderDate", ignore = true)
     Client toEntity(ClientCreateDTO dto);
 
     @Mapping(source = "fullName", target = "fullName")
@@ -25,6 +27,8 @@ public interface ClientMapper {
     @Mapping(source = "tier", target = "tier")
     @Mapping(source = "totalSpent", target = "totalSpent")
     @Mapping(source = "totalOrders", target = "totalOrders")
+    @Mapping(source = "firstOrderDate", target = "firstOrderDate")
+    @Mapping(source = "lastOrderDate", target = "lastOrderDate")
     ClientResponseDTO toDto(Client client);
 
     default User createUser(ClientCreateDTO dto) {
@@ -35,3 +39,4 @@ public interface ClientMapper {
                 .build();
     }
 }
+
