@@ -28,6 +28,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -200,6 +201,47 @@ public class OrderServiceImpl implements IOrderService {
         return orderMapper.toDto(confirmedOrder);
     }
 
+    @Override
+    public OrderResponseDTO cancelOrder(Long orderId) {
+        log.info("Cancelling order ID: {}", orderId);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new BusinessRuleException(
+                    String.format("Cannot cancel order with status '%s'. Only PENDING orders can be cancelled.",
+                            order.getStatus()));
+        }
+
+        order.setStatus(OrderStatus.CANCELED);
+        Order cancelledOrder = orderRepository.save(order);
+
+        log.info("Order {} cancelled successfully", orderId);
+
+        return orderMapper.toDto(cancelledOrder);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getAllOrders(Long clientId) {
+        List<Order> orders;
+
+        if (clientId != null) {
+            log.info("Fetching orders for client ID: {}", clientId);
+            orders = orderRepository.findByClientId(clientId);
+        } else {
+            log.info("Fetching all orders");
+            orders = orderRepository.findAll();
+        }
+
+        log.info("Found {} orders", orders.size());
+
+        return orders.stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     private BigDecimal getTierDiscountRate(CustomerTier tier, BigDecimal subTotal) {
         return switch (tier) {
             case PLATINUM -> subTotal.compareTo(new BigDecimal("1200")) >= 0
@@ -219,3 +261,4 @@ public class OrderServiceImpl implements IOrderService {
         return promoCode.toUpperCase().startsWith(PROMO_CODE_PREFIX);
     }
 }
+
