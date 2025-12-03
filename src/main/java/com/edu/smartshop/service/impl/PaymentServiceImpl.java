@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,12 +55,20 @@ public class    PaymentServiceImpl implements IPaymentService {
                             CASH_LIMIT, createDTO.getAmount()));
         }
 
+        List<Payment> existingPayments = paymentRepository.findByOrderId(order.getId());
+        int nextPaymentNumber = existingPayments.size() + 1;
+
         Payment payment = Payment.builder()
                 .order(order)
+                .paymentNumber(nextPaymentNumber)
                 .amount(createDTO.getAmount())
                 .paymentMethod(createDTO.getPaymentMethod())
                 .paymentDate(LocalDateTime.now())
                 .paymentStatus(PaymentStatus.EN_ATTENTE)
+                .reference(createDTO.getReference())
+                .bank(createDTO.getBank())
+                .chequeNumber(createDTO.getChequeNumber())
+                .dueDate(createDTO.getDueDate())
                 .build();
 
         Payment savedPayment = paymentRepository.save(payment);
@@ -68,8 +77,8 @@ public class    PaymentServiceImpl implements IPaymentService {
         order.setRemainingAmount(newRemainingAmount);
         orderRepository.save(order);
 
-        log.info("Payment created successfully. Payment ID: {}, Order remaining: {} DH",
-                savedPayment.getId(), newRemainingAmount);
+        log.info("Payment #{} created successfully. Payment ID: {}, Order remaining: {} DH",
+                nextPaymentNumber, savedPayment.getId(), newRemainingAmount);
 
         if (newRemainingAmount.compareTo(BigDecimal.ZERO) == 0) {
             log.info("Order {} is now fully paid!", order.getId());
@@ -84,4 +93,73 @@ public class    PaymentServiceImpl implements IPaymentService {
         return paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Payment> getPaymentsByOrderId(Long orderId) {
+        log.info("Fetching payments for order ID: {}", orderId);
+        
+        if (!orderRepository.existsById(orderId)) {
+            throw new ResourceNotFoundException("Order not found with id: " + orderId);
+        }
+        
+        List<Payment> payments = paymentRepository.findByOrderId(orderId);
+        log.info("Found {} payments for order {}", payments.size(), orderId);
+        
+        return payments;
+    }
+
+    @Override
+    public Payment encashPayment(Long paymentId) {
+        log.info("Encashing payment ID: {}", paymentId);
+        
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
+        
+        if (payment.getPaymentStatus() == PaymentStatus.ENCAISSE) {
+            throw new BusinessRuleException("Payment is already encashed");
+        }
+        
+        if (payment.getPaymentStatus() == PaymentStatus.REJETE) {
+            throw new BusinessRuleException("Cannot encash a rejected payment");
+        }
+        
+        payment.setPaymentStatus(PaymentStatus.ENCAISSE);
+        payment.setEncashmentDate(LocalDateTime.now());
+        
+        Payment encashedPayment = paymentRepository.save(payment);
+        log.info("Payment {} encashed successfully", paymentId);
+        
+        return encashedPayment;
+    }
+
+    @Override
+    public Payment rejectPayment(Long paymentId) {
+        log.info("Rejecting payment ID: {}", paymentId);
+        
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
+        
+        if (payment.getPaymentStatus() == PaymentStatus.REJETE) {
+            throw new BusinessRuleException("Payment is already rejected");
+        }
+        
+        if (payment.getPaymentStatus() == PaymentStatus.ENCAISSE) {
+            throw new BusinessRuleException("Cannot reject an encashed payment");
+        }
+        
+        Order order = payment.getOrder();
+        BigDecimal newRemainingAmount = order.getRemainingAmount().add(payment.getAmount());
+        order.setRemainingAmount(newRemainingAmount);
+        orderRepository.save(order);
+        
+        payment.setPaymentStatus(PaymentStatus.REJETE);
+        
+        Payment rejectedPayment = paymentRepository.save(payment);
+        log.info("Payment {} rejected. Order {} remaining amount updated to {} DH", 
+                paymentId, order.getId(), newRemainingAmount);
+        
+        return rejectedPayment;
+    }
 }
+
