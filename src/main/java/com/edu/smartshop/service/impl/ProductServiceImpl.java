@@ -9,6 +9,8 @@ import com.edu.smartshop.mapper.ProductMapper;
 import com.edu.smartshop.repository.ProductRepository;
 import com.edu.smartshop.service.IProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +62,20 @@ public class ProductServiceImpl implements IProductService {
                 .filter(product -> !product.isDeleted())
                 .map(productMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> getAllProductsPaginated(Pageable pageable, boolean includeDeleted) {
+        Page<Product> productPage;
+        
+        if (includeDeleted) {
+            productPage = productRepository.findAll(pageable);
+        } else {
+            productPage = productRepository.findByDeletedFalse(pageable);
+        }
+        
+        return productPage.map(productMapper::toDto);
     }
 
     @Override
