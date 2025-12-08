@@ -17,7 +17,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // Public endpoints
         if (path.startsWith("/auth/") || path.startsWith("/error")) {
             return true;
         }
@@ -40,10 +39,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (!method.equals("GET")) {
                 throw new UnauthorizedException("Clients are not allowed to perform this action");
             }
-            
-            // Clients cannot see other clients' data (simplified check)
-            // In a real app, we would check if the requested ID matches the logged client
-            // But for now, we enforce the "READ ONLY" rule strictly
+        
             return true;
         }
 
