@@ -20,6 +20,7 @@ import com.edu.smartshop.service.IClientService;
 import com.edu.smartshop.service.IOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,9 @@ public class OrderServiceImpl implements IOrderService {
     private final IClientService clientService;
     private final OrderMapper orderMapper;
 
-    private static final BigDecimal TAX_RATE = new BigDecimal("0.20");
+    @Value("${smartshop.tva.rate:0.20}")
+    private BigDecimal taxRate;
+
     private static final BigDecimal PROMO_DISCOUNT = new BigDecimal("0.05");
     private static final String PROMO_CODE_PREFIX = "PROMO-";
 
@@ -110,7 +113,7 @@ public class OrderServiceImpl implements IOrderService {
 
         BigDecimal totalDiscount = tierDiscount.add(promoDiscount);
         BigDecimal netCommercial = subTotal.subtract(totalDiscount);
-        BigDecimal tax = netCommercial.multiply(TAX_RATE).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal tax = netCommercial.multiply(taxRate).setScale(2, RoundingMode.HALF_UP);
         BigDecimal totalTTC = netCommercial.add(tax);
 
         log.debug("Order calculations - SubTotal: {}, TierDiscount: {}, PromoDiscount: {}, TotalDiscount: {}, NetCommercial: {}, Tax: {}, TotalTTC: {}",
