@@ -1,0 +1,195 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "com.edu.smartshop" {
+
+    package "enums" {
+        enum UserRole {
+            ADMIN
+            USER
+        }
+        enum CustomerTier {
+            BASIC
+            SILVER
+            GOLD
+            PLATINUM
+        }
+        enum OrderStatus {
+            PENDING
+            CONFIRMED
+            CANCELED
+        }
+        enum PaymentMethod {
+            ESPECES
+            CHEQUE
+            VIREMENT
+        }
+        enum PaymentStatus {
+            EN_ATTENTE
+            ENCAISSE
+            REJETE
+        }
+    }
+
+    package "entity" {
+        class User {
+            - Long id
+            - String username
+            - String password
+            - UserRole role
+        }
+
+        class Client {
+            - Long id
+            - String fullName
+            - String email
+            - CustomerTier tier
+            - BigDecimal totalSpent
+            - Integer totalOrders
+            - LocalDateTime firstOrderDate
+            - LocalDateTime lastOrderDate
+        }
+
+        class Product {
+            - Long id
+            - String name
+            - BigDecimal price
+            - Integer stock
+            - boolean deleted
+        }
+
+        class Order {
+            - Long id
+            - LocalDateTime date
+            - BigDecimal subTotal
+            - BigDecimal totalDiscount
+            - BigDecimal tax
+            - BigDecimal totalAmount
+            - BigDecimal remainingAmount
+            - String promoCode
+            - OrderStatus status
+        }
+
+        class OrderItem {
+            - Long id
+            - Integer quantity
+            - BigDecimal price
+            - BigDecimal lineTotal
+        }
+
+        class Payment {
+            - Long id
+            - Integer paymentNumber
+            - BigDecimal amount
+            - LocalDateTime paymentDate
+            - LocalDateTime encashmentDate
+            - PaymentMethod paymentMethod
+            - PaymentStatus paymentStatus
+            - String reference
+            - String bank
+            - String chequeNumber
+            - LocalDate dueDate
+        }
+    }
+
+    package "repository" {
+        interface UserRepository
+        interface ClientRepository
+        interface ProductRepository
+        interface OrderRepository
+        interface OrderItemRepository
+        interface PaymentRepository
+    }
+
+    package "service" {
+        interface IAuthService {
+            + login(LoginDTO, HttpSession): User
+            + logout(HttpSession): void
+            + getCurrentUser(HttpSession): User
+        }
+        interface IClientService {
+            + registerClient(ClientRegistrationDTO): ClientDTO
+            + getClientById(Long): ClientDTO
+            + updateClient(Long, ClientUpdateDTO): ClientResponseDTO
+            + getClientOrderHistory(Long): List<OrderResponseDTO>
+            + calculateTier(Client): CustomerTier
+        }
+        interface IProductService {
+            + createProduct(ProductCreateDTO): ProductDTO
+            + getProductById(Long): ProductDTO
+            + getAllProducts(): List<ProductDTO>
+            + getAllActiveProducts(): List<ProductDTO>
+            + getAllProductsPaginated(Pageable, boolean): Page<ProductDTO>
+            + updateProduct(Long, ProductCreateDTO): ProductDTO
+            + deleteProduct(Long): void
+            + restoreProduct(Long): void
+        }
+        interface IOrderService {
+            + createOrder(OrderCreateDTO): OrderResponseDTO
+            + getOrderById(Long): OrderResponseDTO
+            + getAllOrders(Long): List<OrderResponseDTO>
+            + confirmOrder(Long): OrderResponseDTO
+            + cancelOrder(Long): OrderResponseDTO
+        }
+        interface IPaymentService {
+            + addPayment(PaymentCreateDTO): PaymentDTO
+            + getPaymentById(Long): PaymentDTO
+            + getPaymentsByOrderId(Long): List<Payment>
+            + encashPayment(Long): Payment
+            + rejectPayment(Long): Payment
+        }
+
+        class AuthServiceImpl implements IAuthService
+        class ClientServiceImpl implements IClientService
+        class ProductServiceImpl implements IProductService
+        class OrderServiceImpl implements IOrderService
+        class PaymentServiceImpl implements IPaymentService
+    }
+
+    package "controller" {
+        class AuthController
+        class ClientController
+        class ProductController
+        class OrderController
+        class PaymentController
+    }
+
+    ' Relationships
+    User "1" -- "1" Client : has >
+    Client "1" -- "*" Order : places >
+    Order "1" *-- "*" OrderItem : contains >
+    OrderItem "*" -- "1" Product : refers to >
+    Order "1" -- "*" Payment : has >
+
+    ' Controller -> Service
+    AuthController ..> IAuthService
+    ClientController ..> IClientService
+    ProductController ..> IProductService
+    OrderController ..> IOrderService
+    PaymentController ..> IPaymentService
+
+    ' Service -> Repository
+    AuthServiceImpl --> UserRepository
+    ClientServiceImpl --> ClientRepository
+    ClientServiceImpl --> UserRepository
+    ProductServiceImpl --> ProductRepository
+    OrderServiceImpl --> OrderRepository
+    OrderServiceImpl --> OrderItemRepository
+    OrderServiceImpl --> ClientRepository
+    OrderServiceImpl --> ProductRepository
+    OrderServiceImpl --> IClientService
+    PaymentServiceImpl --> PaymentRepository
+    PaymentServiceImpl --> OrderRepository
+
+    ' Enums usage
+    User ..> UserRole
+    Client ..> CustomerTier
+    Order ..> OrderStatus
+    Payment ..> PaymentMethod
+    Payment ..> PaymentStatus
+
+}
+
+@enduml

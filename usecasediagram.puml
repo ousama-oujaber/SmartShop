@@ -1,0 +1,79 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Client" as client
+actor "Admin" as admin
+
+rectangle "SmartShop System" {
+
+    package "Authentication" {
+        usecase "Login" as UC_Login
+        usecase "Logout" as UC_Logout
+        usecase "Register" as UC_Register
+    }
+
+    package "Product Management" {
+        usecase "View Products" as UC_ViewProducts
+        usecase "Create Product" as UC_CreateProduct
+        usecase "Update Product" as UC_UpdateProduct
+        usecase "Delete Product (Soft)" as UC_DeleteProduct
+        usecase "Restore Product" as UC_RestoreProduct
+    }
+
+    package "Order Management" {
+        usecase "Create Order" as UC_CreateOrder
+        usecase "View My Orders" as UC_ViewMyOrders
+        usecase "View All Orders" as UC_ViewAllOrders
+        usecase "Cancel Order" as UC_CancelOrder
+        usecase "Confirm Order" as UC_ConfirmOrder
+    }
+
+    package "Client Management" {
+        usecase "Update Profile" as UC_UpdateProfile
+        usecase "View Client History" as UC_ViewClientHistory
+    }
+
+    package "Payment Management" {
+        usecase "Add Payment" as UC_AddPayment
+        usecase "View Payments" as UC_ViewPayments
+        usecase "Encash Payment" as UC_EncashPayment
+        usecase "Reject Payment" as UC_RejectPayment
+    }
+}
+
+' Client Relationships
+client -- UC_Login
+client -- UC_Logout
+client -- UC_Register
+client -- UC_ViewProducts
+client -- UC_CreateOrder
+client -- UC_ViewMyOrders
+client -- UC_CancelOrder
+client -- UC_UpdateProfile
+
+' Admin Relationships
+admin -- UC_Login
+admin -- UC_Logout
+admin -- UC_ViewProducts
+admin -- UC_CreateProduct
+admin -- UC_UpdateProduct
+admin -- UC_DeleteProduct
+admin -- UC_RestoreProduct
+admin -- UC_ViewAllOrders
+admin -- UC_ConfirmOrder
+admin -- UC_ViewClientHistory
+admin -- UC_AddPayment
+admin -- UC_ViewPayments
+admin -- UC_EncashPayment
+admin -- UC_RejectPayment
+
+' Include/Extend relationships
+UC_CreateOrder ..> UC_Login : <<include>>
+UC_ViewMyOrders ..> UC_Login : <<include>>
+UC_UpdateProfile ..> UC_Login : <<include>>
+UC_CreateProduct ..> UC_Login : <<include>>
+UC_ConfirmOrder ..> UC_Login : <<include>>
+UC_AddPayment ..> UC_Login : <<include>>
+
+@enduml
