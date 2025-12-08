@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -34,4 +35,8 @@ public class Client {
     private BigDecimal totalSpent;
 
     private Integer totalOrders;
+
+    private LocalDateTime firstOrderDate;
+
+    private LocalDateTime lastOrderDate;
 }

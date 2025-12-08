@@ -4,6 +4,7 @@ import com.edu.smartshop.enums.CustomerTier;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class ClientResponseDTO {
@@ -13,4 +14,6 @@ public class ClientResponseDTO {
     private CustomerTier tier;
     private BigDecimal totalSpent;
     private Integer totalOrders;
+    private LocalDateTime firstOrderDate;
+    private LocalDateTime lastOrderDate;
 }
