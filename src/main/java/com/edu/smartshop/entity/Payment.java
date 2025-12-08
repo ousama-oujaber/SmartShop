@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +27,8 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    private Integer paymentNumber;
+
     private BigDecimal amount;
 
     private LocalDateTime paymentDate;
@@ -37,4 +40,13 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    private String reference;
+
+    private String bank;
+
+    private String chequeNumber;
+
+    private LocalDate dueDate;
 }
+
