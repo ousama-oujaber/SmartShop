@@ -10,7 +10,6 @@ rectangle "SmartShop System" {
     package "Authentication" {
         usecase "Login" as UC_Login
         usecase "Logout" as UC_Logout
-        usecase "Register" as UC_Register
     }
 
     package "Product Management" {
@@ -30,7 +29,9 @@ rectangle "SmartShop System" {
     }
 
     package "Client Management" {
-        usecase "Update Profile" as UC_UpdateProfile
+        usecase "Create Client" as UC_CreateClient
+        usecase "Update Client Profile" as UC_UpdateProfile
+        usecase "View Client Profile" as UC_ViewProfile
         usecase "View Client History" as UC_ViewClientHistory
     }
 
@@ -42,17 +43,14 @@ rectangle "SmartShop System" {
     }
 }
 
-' Client Relationships
+' Client Relationships (READ ONLY)
 client -- UC_Login
 client -- UC_Logout
-client -- UC_Register
 client -- UC_ViewProducts
-client -- UC_CreateOrder
 client -- UC_ViewMyOrders
-client -- UC_CancelOrder
-client -- UC_UpdateProfile
+client -- UC_ViewProfile
 
-' Admin Relationships
+' Admin Relationships (FULL ACCESS)
 admin -- UC_Login
 admin -- UC_Logout
 admin -- UC_ViewProducts
@@ -60,8 +58,13 @@ admin -- UC_CreateProduct
 admin -- UC_UpdateProduct
 admin -- UC_DeleteProduct
 admin -- UC_RestoreProduct
+admin -- UC_CreateOrder
 admin -- UC_ViewAllOrders
+admin -- UC_CancelOrder
 admin -- UC_ConfirmOrder
+admin -- UC_CreateClient
+admin -- UC_UpdateProfile
+admin -- UC_ViewProfile
 admin -- UC_ViewClientHistory
 admin -- UC_AddPayment
 admin -- UC_ViewPayments

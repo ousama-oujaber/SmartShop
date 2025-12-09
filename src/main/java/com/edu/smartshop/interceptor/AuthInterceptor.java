@@ -28,18 +28,13 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         User user = (User) session.getAttribute("LOGGED_USER");
 
-        // ADMIN can do everything
         if (user.getRole() == UserRole.ADMIN) {
             return true;
         }
-
-        // CLIENT restrictions
         if (user.getRole() == UserRole.CLIENT) {
-            // Clients can only do GET requests (Read-only)
             if (!method.equals("GET")) {
                 throw new UnauthorizedException("Clients are not allowed to perform this action");
             }
-        
             return true;
         }
 

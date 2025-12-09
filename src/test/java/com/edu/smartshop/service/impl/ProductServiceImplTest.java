@@ -64,7 +64,6 @@ class ProductServiceImplTest {
         createDTO.setStock(100);
     }
 
-    // ==================== CREATE PRODUCT TESTS ====================
 
     @Test
     @DisplayName("createProduct - Should create product successfully")
@@ -94,8 +93,6 @@ class ProductServiceImplTest {
         verify(productRepository, never()).save(any());
     }
 
-    // ==================== GET PRODUCT BY ID TESTS ====================
-
     @Test
     @DisplayName("getProductById - Should return product when found")
     void getProductById_ShouldReturnProductWhenFound() {
@@ -118,7 +115,6 @@ class ProductServiceImplTest {
                 .hasMessageContaining("not found");
     }
 
-    // ==================== GET ALL PRODUCTS TESTS ====================
 
     @Test
     @DisplayName("getAllProducts - Should return all products")
@@ -144,7 +140,6 @@ class ProductServiceImplTest {
         assertThat(result).hasSize(2);
     }
 
-    // ==================== GET ALL ACTIVE PRODUCTS TESTS ====================
 
     @Test
     @DisplayName("getAllActiveProducts - Should return only active products")
@@ -164,7 +159,6 @@ class ProductServiceImplTest {
         assertThat(result.get(0).getName()).isEqualTo("Test Product");
     }
 
-    // ==================== UPDATE PRODUCT TESTS ====================
 
     @Test
     @DisplayName("updateProduct - Should update product successfully")
@@ -217,7 +211,6 @@ class ProductServiceImplTest {
                 .hasMessageContaining("already exists");
     }
 
-    // ==================== DELETE PRODUCT TESTS ====================
 
     @Test
     @DisplayName("deleteProduct - Should soft delete product successfully")
@@ -240,7 +233,6 @@ class ProductServiceImplTest {
                 .hasMessageContaining("already deleted");
     }
 
-    // ==================== RESTORE PRODUCT TESTS ====================
 
     @Test
     @DisplayName("restoreProduct - Should restore deleted product successfully")
