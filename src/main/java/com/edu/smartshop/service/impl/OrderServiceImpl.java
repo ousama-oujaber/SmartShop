@@ -3,6 +3,7 @@ package com.edu.smartshop.service.impl;
 import com.edu.smartshop.dto.request.OrderCreateDTO;
 import com.edu.smartshop.dto.request.OrderItemDTO;
 import com.edu.smartshop.dto.response.OrderResponseDTO;
+import com.edu.smartshop.dto.response.ProductDTO;
 import com.edu.smartshop.entity.Client;
 import com.edu.smartshop.entity.Order;
 import com.edu.smartshop.entity.OrderItem;
@@ -12,6 +13,7 @@ import com.edu.smartshop.enums.OrderStatus;
 import com.edu.smartshop.exception.BusinessRuleException;
 import com.edu.smartshop.exception.ResourceNotFoundException;
 import com.edu.smartshop.mapper.OrderMapper;
+import com.edu.smartshop.mapper.ProductMapper;
 import com.edu.smartshop.repository.ClientRepository;
 import com.edu.smartshop.repository.OrderItemRepository;
 import com.edu.smartshop.repository.OrderRepository;
@@ -43,6 +45,7 @@ public class OrderServiceImpl implements IOrderService {
     private final ProductRepository productRepository;
     private final IClientService clientService;
     private final OrderMapper orderMapper;
+    private final ProductMapper productMapper;
 
     @Value("${smartshop.tva.rate:0.20}")
     private BigDecimal taxRate;
@@ -257,11 +260,12 @@ public class OrderServiceImpl implements IOrderService {
         };
     }
 
-    private boolean isValidPromoCode(String promoCode) {
+    boolean isValidPromoCode(String promoCode) {
         if (promoCode == null || promoCode.trim().isEmpty()) {
             return false;
         }
-        return promoCode.toUpperCase().startsWith(PROMO_CODE_PREFIX);
+        // Regex: PROMO- followed by exactly 4 uppercase alphanumeric characters
+        return promoCode.matches("PROMO-[A-Z0-9]{4}");
     }
 }
 

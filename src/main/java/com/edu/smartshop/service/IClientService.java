@@ -12,6 +12,7 @@ import java.util.List;
 public interface IClientService {
     ClientResponseDTO createClient(ClientCreateDTO createDTO);
     ClientResponseDTO getClientById(Long clientId);
+    List<ClientResponseDTO> getAllClients();
     ClientResponseDTO updateClient(Long clientId, ClientUpdateDTO updateDTO);
     List<OrderResponseDTO> getClientOrderHistory(Long clientId);
     CustomerTier calculateTier(Client client);

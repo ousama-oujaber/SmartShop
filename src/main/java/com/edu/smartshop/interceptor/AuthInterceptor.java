@@ -17,7 +17,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        if (path.startsWith("/auth/") || path.startsWith("/error")) {
+        if (path.startsWith("/api/auth/") || path.startsWith("/error") || path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui")) {
             return true;
         }
 
@@ -31,13 +31,22 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (user.getRole() == UserRole.ADMIN) {
             return true;
         }
+
         if (user.getRole() == UserRole.CLIENT) {
-            if (!method.equals("GET")) {
-                throw new UnauthorizedException("Clients are not allowed to perform this action");
+            
+            
+            if (method.equals("GET")) {
+                if (path.startsWith("/api/products")) {
+                    return true;
+                }
+                if (path.startsWith("/api/clients/me")) {
+                    return true;
+                }
             }
-            return true;
+            
+            throw new UnauthorizedException("Access denied: Insufficient permissions for CLIENT");
         }
 
-        return true;
+        return false;
     }
 }

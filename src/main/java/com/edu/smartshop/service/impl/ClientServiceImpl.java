@@ -86,6 +86,17 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ClientResponseDTO> getAllClients() {
+        log.info("Fetching all clients");
+        List<Client> clients = clientRepository.findAll();
+        log.info("Found {} clients", clients.size());
+        return clients.stream()
+                .map(clientMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ClientResponseDTO updateClient(Long clientId, ClientUpdateDTO updateDTO) {
         log.info("Updating client with ID: {}", clientId);
 

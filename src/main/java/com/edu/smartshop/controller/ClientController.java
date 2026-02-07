@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/api/clients")
 @RequiredArgsConstructor
 public class ClientController {
 
@@ -24,6 +24,12 @@ public class ClientController {
     public ResponseEntity<ClientResponseDTO> createClient(@Valid @RequestBody ClientCreateDTO createDTO) {
         ClientResponseDTO client = clientService.createClient(createDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(client);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClientResponseDTO>> getAllClients() {
+        List<ClientResponseDTO> clients = clientService.getAllClients();
+        return ResponseEntity.ok(clients);
     }
 
     @GetMapping("/{id}")
